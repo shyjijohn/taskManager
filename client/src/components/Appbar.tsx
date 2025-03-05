@@ -102,7 +102,7 @@ const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
                         variant="h6"
                         noWrap
                         component="div"
-                        sx={{ pt: 0.5, flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                        sx={{ pt: 0.5, flexGrow: 1}}
                     >
                         Task Manager
                     </Typography>

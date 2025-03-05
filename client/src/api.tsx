@@ -3,6 +3,7 @@ import { Task } from "./types/Task";
 
 const API_URL = import.meta.env.VITE_BACKEND_HOST + "/tasks";
 const USE_INDEXEDDB = true;
+const DB_NAME = "DBTaskManager";
 
 // Define the Dexie database class for tasks
 class TaskDatabase extends Dexie {
@@ -10,7 +11,7 @@ class TaskDatabase extends Dexie {
   tasks: Dexie.Table<Task, string>;
 
   constructor() {
-    super("DBTaskManager");
+    super(DB_NAME);
     // Define the schema for version 1. We're using "id" as the primary key.
     this.version(1).stores({
       tasks: "id",

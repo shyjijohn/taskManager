@@ -9,15 +9,15 @@ import { Task } from "../types/Task";
 interface KanbanBoardProps {
     tasks: Task[];
     handleDrop: (id: string, newStatus: Task["status"]) => void;
-    handleDeleteTask: (taskData: Task) => void
+    handleDeleteTask: (taskData: Task) => void;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, handleDrop, handleDeleteTask }) => {
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, handleDrop, handleDeleteTask}) => {
 
     return (
         <DndProvider backend={HTML5Backend}>
             <Box p={2}>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} wrap="nowrap">
                     {["todo", "in-progress", "done"].map((status) => (
                         <Grid item key={status}>
                             <KanbanColumn
