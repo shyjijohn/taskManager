@@ -16,6 +16,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import InputBase from '@mui/material/InputBase';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Button, Menu, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { useClerk } from '@clerk/clerk-react';
 
 interface AppBarProps {
     OnCreateButtonClick: () => void;
@@ -75,6 +76,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
+
+    const { signOut } = useClerk()
+
     const theme = useTheme();
 
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -88,9 +92,7 @@ const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
     };
 
     const logoutUser = () => {
-
-        //Todo logout
-
+        signOut();
         handleCloseUserMenu();
     };
 
@@ -102,14 +104,14 @@ const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
                         variant="h6"
                         noWrap
                         component="div"
-                        sx={{ pt: 0.5, flexGrow: 1}}
+                        sx={{ pt: 0.5, flexGrow: 1 }}
                     >
                         Task Manager
                     </Typography>
                 </Stack>
 
                 <Box sx={{ flexGrow: 1 }} />
-                <Button variant="contained" sx={{ background: 'transparent', color:'white' }} onClick={CreateTask}>
+                <Button variant="contained" sx={{ background: 'transparent', color: 'white' }} onClick={CreateTask}>
                     Create
                 </Button>
                 <Stack justifyContent="center" ml='2'>

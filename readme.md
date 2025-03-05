@@ -15,4 +15,5 @@ For backend
 
 cd server 
 npm install
-nodemon backendserver.js
+npm install -g nodemon
+npx nodemon backendserver.js
