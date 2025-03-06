@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     AppBar,
     IconButton,
@@ -30,34 +30,60 @@ const modalStyle = {
     borderRadius: 2,
     boxShadow: 24,
     p: 4,
-  };
+};
 
 interface TaskModalProps {
     open: boolean;
+    edit: boolean;
+    taskToEdit: Task | undefined;
     handleClose: () => void;
-    handleCreate: (taskData : Task) => void;
+    handleCreate: (taskData: Task) => void;
+    handleEdit: (taskData: Task) => void;
 }
 
-const CreatePopup: React.FC<TaskModalProps> = ({ open, handleClose, handleCreate }) => {
+const CreateOrEditPopup: React.FC<TaskModalProps> = (props) => {
 
-    const [taskName, setTaskName] = useState('');
-    const [taskDescription, setTaskDescription] = useState('');
-    const [taskDate, setTaskDate] = useState('');
+    const [taskName, setTaskName] = useState(props.taskToEdit ? props.taskToEdit.title : '');
+    const [taskDescription, setTaskDescription] = useState(props.taskToEdit ? props.taskToEdit.description : '');
 
+    // console.log("Props", props, taskName, taskDescription)
+    // console.log("taskName", taskName, taskDescription)
+    // console.log("taskDescription", taskDescription)
+
+
+    useEffect(() => {
+        if (props.edit && props.taskToEdit) {
+            setTaskName(props.taskToEdit.title);
+            setTaskDescription(props.taskToEdit.description);
+        }
+    }, [props.edit, props.taskToEdit]);
+    
     const handleSubmit = () => {
-        
-        handleCreate({
-            id: uuidv4(), 
-            title: taskName,
-            status: 'todo'
-        });
-        handleClose();
+
+        if (props.edit) {
+            props.handleEdit({
+                id: props.taskToEdit ? props.taskToEdit.id : uuidv4(),
+                title: taskName,
+                description: taskDescription,
+                status: props.taskToEdit ? props.taskToEdit.status : 'todo'
+            })
+        }
+        else {
+            props.handleCreate({
+                id: uuidv4(),
+                title: taskName,
+                description: taskDescription,
+                status: 'todo'
+            });
+        }
+        props.handleClose();
     };
 
     return (
-        <Modal open={open} onClose={handleClose}>
+        <Modal open={props.open} onClose={props.handleClose}>
             <Box sx={{ ...modalStyle }}>
-                <Typography variant="h6" gutterBottom>Create Task</Typography>
+
+                <Typography variant="h6" gutterBottom>{props.edit ? "Edit Task" : "Create Task"} </Typography>
                 <Stack spacing={2}>
                     <TextField
                         label="Task Name"
@@ -75,21 +101,11 @@ const CreatePopup: React.FC<TaskModalProps> = ({ open, handleClose, handleCreate
                         value={taskDescription}
                         onChange={(e) => setTaskDescription(e.target.value)}
                     />
-                    <TextField
-                        label="Due Date"
-                        variant="outlined"
-                        fullWidth
-                        type="date"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        value={taskDate}
-                        onChange={(e) => setTaskDate(e.target.value)}
-                    />
+
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                        <Button color="primary" onClick={handleClose}>Cancel</Button>
+                        <Button color="primary" onClick={props.handleClose}>Cancel</Button>
                         <Button color="secondary" onClick={handleSubmit}>
-                            Create
+                            {props.edit ? "Edit" : "Create"}
                         </Button>
                     </Box>
                 </Stack>
@@ -98,4 +114,4 @@ const CreatePopup: React.FC<TaskModalProps> = ({ open, handleClose, handleCreate
     );
 };
 
-export default CreatePopup
+export default CreateOrEditPopup

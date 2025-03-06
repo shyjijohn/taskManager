@@ -2,16 +2,18 @@ import KanbanBoard from "./components/KanbanBoard";
 import { Box, Container, Toolbar } from "@mui/material";
 import AppBar from './components/Appbar';
 import { useEffect, useState } from "react";
-import CreatePopup from "./components/CreatePopup";
+import CreateOrEditPopup from "./components/CreateOrEditPopup";
 
 import { Task } from "./types/Task";
-import { createTask, deleteTask, getTasks, updateTaskStatus } from "./api";
+import { createTask, deleteTask, getTasks, updateTask, updateTaskStatus } from "./api";
 import { SignIn, useAuth, useUser } from "@clerk/clerk-react";
 
 function App() {
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [openCreatePopup, setOpenCreatePopup] = useState(false);
+  const [isEditTask, setIsEditTask] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | undefined>();
   const { isSignedIn, isLoaded, user } = useUser();
   const { getToken } = useAuth();
 
@@ -23,6 +25,14 @@ function App() {
 
 
   const handleAppBarCreateButtonClick = () => {
+    setIsEditTask(false);
+    setOpenCreatePopup(true);
+
+  };
+
+  const handleTaskEditButtonClick = (taskE: Task) => {
+    setTaskToEdit(taskE);
+    setIsEditTask(true);
     setOpenCreatePopup(true);
 
   };
@@ -60,18 +70,34 @@ function App() {
 
     handleCloseCreatePopup();
   };
+  const handleEdit = (taskData: Task) => {
 
+    if (taskData.title.trim() !== "") {
+
+      updateTask(taskData, getToken)
+        .then(() => {
+          getTasks(getToken)
+            .then(setTasks)
+            .catch(err => console.log(err.message));
+
+        })
+        .catch(console.error);
+    }
+
+    handleCloseCreatePopup();
+  };
 
   const handleDeleteTask = (taskData: Task) => {
 
     deleteTask(taskData.id, getToken)
-      .then(response => console.log(response.message))
+      .then((response) => {
+        console.log(response.message)
+        getTasks(getToken)
+          .then(setTasks)
+          .catch(err => console.log(err.message));
+
+      })
       .catch(console.error);
-
-    getTasks(getToken)
-      .then(setTasks)
-      .catch(err => console.log(err.message));
-
   };
 
 
@@ -82,11 +108,14 @@ function App() {
           <div>
             <AppBar OnCreateButtonClick={handleAppBarCreateButtonClick} />
             <Toolbar />
-            <KanbanBoard tasks={tasks} handleDrop={handleDrop} handleDeleteTask={handleDeleteTask} />
-            <CreatePopup
+            <KanbanBoard tasks={tasks} handleDrop={handleDrop} handleDeleteTask={handleDeleteTask} OnTaskEditButtonClick={handleTaskEditButtonClick} />
+            <CreateOrEditPopup
+              edit={isEditTask}
               open={openCreatePopup}
+              taskToEdit={taskToEdit}
               handleClose={handleCloseCreatePopup}
               handleCreate={handleCreateTask}
+              handleEdit={handleEdit}
             />
           </div>
         ) :

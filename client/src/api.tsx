@@ -20,6 +20,7 @@ export const getTasks = async (getToken : () => Promise<string | null>): Promise
 
   const response = await fetchWithAuth(API_URL,{}, getToken);
   if (!response.ok) throw new Error("Failed to fetch tasks");
+  console.log("Got tasks from DB")
   return response.json();
 };
 
@@ -53,4 +54,29 @@ export const deleteTask = async (id: string, getToken : () => Promise<string | n
   }, getToken);
   if (!response.ok) throw new Error("Failed to delete task");
   return response.json();
+};
+
+export const updateTask = async (updatedTask : Task, getToken : () => Promise<string | null>) => {
+  
+  try {
+      const response = await fetchWithAuth(`${API_URL}/${updatedTask.id}`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json'},
+          body: JSON.stringify(updatedTask),
+      }, getToken);
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error:', errorData.message);
+          alert('Error updating task');
+          return;
+      }
+
+      const data = await response.json();
+      console.log('Task updated successfully:', data);
+  } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to update task');
+  }
 };

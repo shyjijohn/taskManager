@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Paper, Button } from "@mui/material";
+import { Box, Typography, Paper, Button, Divider } from "@mui/material";
 import { useDrop } from "react-dnd";
 import { Task } from "../types/Task";
 import TaskCard from "./TaskCard";
@@ -11,9 +11,10 @@ interface KanbanColumnProps {
     tasks: Task[];
     onDrop: (id: string, newStatus: Task["status"]) => void;
     onDelete: (taskData: Task) => void
+    OnTaskEditButtonClick: (taskData: Task) => void;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, status, tasks, onDrop, onDelete }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, status, tasks, onDrop, onDelete, OnTaskEditButtonClick }) => {
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "TASK",
         drop: (item: { id: string }) => onDrop(item.id, status),
@@ -28,15 +29,16 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, status, tasks, onDro
             sx={{
                 p: 2,
                 minWidth: 250,
-                bgcolor: isOver ? 'lightgray' : 'white',
+                bgcolor: isOver ? 'lightgrey' : 'whitesmoke',
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'column'
             }}
         >
             <Typography variant="body1">{title}</Typography>
+            <Divider sx={{ marginTop: 1 }} />
             <Box mt={2}>
                 {tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onDelete={onDelete} />
+                    <TaskCard key={task.id} task={task} onDelete={onDelete} OnTaskEditButtonClick={OnTaskEditButtonClick} />
                 ))}
             </Box>
         </Paper>

@@ -14,10 +14,10 @@ app.use(cors());
 app.use(express.json());
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'shyjimysql!123',
-    database: 'taskManager'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
 });
 
 
@@ -48,6 +48,7 @@ const initializeDB = () => {
         CREATE TABLE IF NOT EXISTS tasks (
           id VARCHAR(255) PRIMARY KEY,
           title VARCHAR(255) NOT NULL,
+          description VARCHAR(255) NULL,
           status ENUM('todo', 'in-progress', 'done') NOT NULL,
           userId int,
           FOREIGN KEY (userId) REFERENCES UserData(id) ON DELETE CASCADE
@@ -127,9 +128,9 @@ app.post('/tasks', requireAuth(), async (req, res) => {
     const userId = await getOrAddUser(req);
     if (!userId) return res.status(401).json({ message: 'Unauthorized: User not found' });
 
-    const { id, title, status } = req.body;
-    const query = 'INSERT INTO tasks (id, title, status, userId) VALUES (?, ?, ?, ?)';
-    connection.query(query, [id, title, status, userId], (err, results) => {
+    const { id, title, description, status } = req.body;
+    const query = 'INSERT INTO tasks (id, title, description, status, userId) VALUES (?, ?, ?, ?, ?)';
+    connection.query(query, [id, title, description, status, userId], (err, results) => {
         if (err) {
             return res.status(500).json({ message: 'Error creating task' });
         }
@@ -155,6 +156,37 @@ app.put('/tasks/:id/status', requireAuth(), async (req, res) => {
     });
 });
 
+app.put('/tasks/:id', requireAuth(), async (req, res) => {
+    console.log("Editing TAsk")
+    const userId = await getOrAddUser(req);
+    if (!userId) return res.status(401).json({ message: 'Unauthorized: User not found' });
+
+    const taskId = req.params.id;  // Get task ID from the URL parameter
+    const { title, description, status } = req.body;
+
+    // SQL query to update task by id
+    const query = `
+        UPDATE tasks 
+        SET title = ?, description = ?, status = ? 
+        WHERE id = ? AND userId = ?
+    `;
+
+    // Run the query to update the task
+    connection.query(query, [title, description, status, taskId, userId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error updating task' });
+        }
+
+        // If no rows were affected, the task might not exist for the current user
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ message: 'Task not found or unauthorized' });
+        }
+
+        res.status(200).json({ message: 'Task updated successfully', taskId, title, description, status });
+    });
+});
+
+
 app.delete('/tasks/:id', requireAuth(), async (req, res) => {
     const userId = await getOrAddUser(req);
     if (!userId) return res.status(401).json({ message: 'Unauthorized: User not found' });
@@ -173,7 +205,7 @@ app.delete('/tasks/:id', requireAuth(), async (req, res) => {
 });
 
 
-app.listen(3002, () => {
+app.listen(process.env.PORT, () => {
     console.log('Hey its me Shyji!! --   Backend server is running');
     initializeDB();
 });

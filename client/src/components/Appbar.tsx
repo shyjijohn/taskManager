@@ -77,7 +77,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
 
-    const { signOut } = useClerk()
+    const { user, signOut } = useClerk()
 
     const theme = useTheme();
 
@@ -106,7 +106,7 @@ const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
                         component="div"
                         sx={{ pt: 0.5, flexGrow: 1 }}
                     >
-                        Task Manager
+                        TaskFlow
                     </Typography>
                 </Stack>
 
@@ -129,26 +129,33 @@ const AppBar: React.FC<AppBarProps> = ({ OnCreateButtonClick: CreateTask }) => {
                     <IconButton onClick={handleOpenUserMenu} size="large" edge="end" aria-label="account of current user" color="inherit">
                         <AccountCircle />
                     </IconButton>
-                    <Menu
-                        sx={{ mt: '45px' }}
-                        id="menu-appbar"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                    >
-                        <MenuItem key={"Logout"} onClick={logoutUser}>
-                            <Typography sx={{ textAlign: 'center' }}>{"Logout"}</Typography>
-                        </MenuItem>
-                    </Menu>
+                    {user && (
+                        <Menu
+                            sx={{ mt: '45px' }}
+                            id="menu-appbar"
+                            anchorEl={anchorElUser}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={Boolean(anchorElUser)}
+                            onClose={handleCloseUserMenu}
+                        >
+                            <MenuItem disabled>
+                                <Typography variant="body1">
+                                    {user.firstName} {user.lastName} ({user.emailAddresses[0].emailAddress})
+                                </Typography>
+                            </MenuItem>
+                            <MenuItem key="Logout" onClick={logoutUser}>
+                                <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
+                            </MenuItem>
+                        </Menu>
+                    )}
                 </Box>
             </Toolbar>
         </AppBarStyled>

@@ -10,9 +10,10 @@ interface KanbanBoardProps {
     tasks: Task[];
     handleDrop: (id: string, newStatus: Task["status"]) => void;
     handleDeleteTask: (taskData: Task) => void;
+    OnTaskEditButtonClick: (taskData: Task) => void;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, handleDrop, handleDeleteTask}) => {
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, handleDrop, handleDeleteTask, OnTaskEditButtonClick}) => {
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -26,6 +27,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, handleDrop, handleDele
                                 tasks={tasks.filter((task) => task.status === status)}
                                 onDrop={handleDrop}
                                 onDelete={handleDeleteTask}
+                                OnTaskEditButtonClick={OnTaskEditButtonClick}
                             />
                         </Grid>
                     ))}
