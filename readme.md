@@ -1,8 +1,9 @@
 # TaskFlow
-## A simple task managing app. 
+A simple task managing app. 
+
 ### To run client and server applications follow the below commands. 
 
-## For development : 
+## For client : 
 
 ```
 cd client
@@ -10,7 +11,7 @@ npm install
 npm run dev
 ```
 
-## For backend
+## For backend server :
 
 ```
 cd server 
