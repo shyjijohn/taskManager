@@ -134,7 +134,7 @@ app.post('/tasks', requireAuth(), async (req, res) => {
         if (err) {
             return res.status(500).json({ message: 'Error creating task' });
         }
-        res.status(201).json({ id, title, status, userId });
+        res.status(201).json({ id, title, description, status, userId });
     });
 });
 

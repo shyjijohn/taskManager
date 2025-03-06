@@ -42,30 +42,42 @@ function App() {
   };
 
   const handleDrop = (id: string, newStatus: Task["status"]) => {
+
+    setTasks(prevTasks => prevTasks.map(t =>
+      t.id === id ? { ...t, status: newStatus } : t
+    ));
+
     updateTaskStatus(id, newStatus, getToken)
       .then((task) => {
         console.log("Updated:", task)
+      })
+      .catch((err) => {
+        console.error(err)
         getTasks(getToken)
           .then(setTasks)
           .catch(console.error);
-
-      })
-      .catch(console.error);
+      });
   };
 
 
   const handleCreateTask = (taskData: Task) => {
-
+    console.log(taskData);
+    setTasks(prevTasks => [...prevTasks, { ...taskData, id: 'temp-id' }]);
     if (taskData.title.trim() !== "") {
       createTask(taskData, getToken)
         .then((task) => {
           console.log("Created:", task)
-          getTasks(getToken)
-            .then(setTasks)
-            .catch(err => console.log(err.message));
+          setTasks(prevTasks => prevTasks.map(t => 
+            t.id === 'temp-id' ? task : t
+          ));
 
         })
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err)
+          getTasks(getToken)
+            .then(setTasks)
+            .catch(console.error);
+        });
     }
 
     handleCloseCreatePopup();
@@ -89,6 +101,8 @@ function App() {
 
   const handleDeleteTask = (taskData: Task) => {
 
+    setTasks(prevTasks => prevTasks.filter(t => t.id !== taskData.id));
+
     deleteTask(taskData.id, getToken)
       .then((response) => {
         console.log(response.message)
@@ -97,7 +111,12 @@ function App() {
           .catch(err => console.log(err.message));
 
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error(err)
+        getTasks(getToken)
+          .then(setTasks)
+          .catch(console.error);
+      });
   };
 
 

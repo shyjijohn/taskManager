@@ -76,6 +76,8 @@ const CreateOrEditPopup: React.FC<TaskModalProps> = (props) => {
                 status: 'todo'
             });
         }
+        setTaskName("")
+        setTaskDescription("")
         props.handleClose();
     };
 
